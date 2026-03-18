@@ -1,3 +1,4 @@
+import database.InicializadorBanco;
 import repository.ClienteRepositorio;
 import repository.ProdutoRepositorio;
 import repository.VendaRepositorio;
@@ -10,6 +11,9 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
+        // Inicializa o banco de dados (cria o arquivo e as tabelas se não existirem)
+        InicializadorBanco.inicializar();
+
         // Nimbus: L&F moderno, suporta componentes customizados corretamente
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {

@@ -37,18 +37,21 @@ public class ProdutoServico {
         Produto p = buscarOuErro(id);
         if (novoNome == null || novoNome.isBlank()) throw new IllegalArgumentException("Nome não pode ser vazio.");
         p.setNome(novoNome.trim());
+        repositorio.atualizar(p);
     }
 
     public void atualizarPreco(int id, double novoPreco) {
         Produto p = buscarOuErro(id);
         if (novoPreco <= 0) throw new IllegalArgumentException("Preço deve ser maior que zero.");
         p.setPreco(novoPreco);
+        repositorio.atualizar(p);
     }
 
     public void atualizarEstoque(int id, int novoEstoque) {
         Produto p = buscarOuErro(id);
         if (novoEstoque < 0) throw new IllegalArgumentException("Estoque não pode ser negativo.");
         p.setQuantidadeEstoque(novoEstoque);
+        repositorio.atualizar(p);
     }
 
     public void descontarEstoque(int id, int quantidade) {
@@ -58,6 +61,7 @@ public class ProdutoServico {
                     "Estoque insuficiente para '" + p.getNome() + "'. Disponível: " + p.getQuantidadeEstoque());
         }
         p.setQuantidadeEstoque(p.getQuantidadeEstoque() - quantidade);
+        repositorio.atualizar(p);
     }
 
     public boolean remover(int id) {

@@ -14,6 +14,7 @@ public class Cliente {
     }
 
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
     public String getNome() { return nome; }
     public String getTelefone() { return telefone; }
     public String getEmail() { return email; }

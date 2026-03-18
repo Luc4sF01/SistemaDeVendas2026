@@ -36,16 +36,20 @@ public class ClienteServico {
         Cliente c = buscarOuErro(id);
         if (novoNome == null || novoNome.isBlank()) throw new IllegalArgumentException("Nome não pode ser vazio.");
         c.setNome(novoNome.trim());
+        repositorio.atualizar(c);
     }
 
     public void atualizarTelefone(int id, String novoTelefone) {
         Cliente c = buscarOuErro(id);
         if (novoTelefone == null || novoTelefone.isBlank()) throw new IllegalArgumentException("Telefone não pode ser vazio.");
         c.setTelefone(novoTelefone.trim());
+        repositorio.atualizar(c);
     }
 
     public void atualizarEmail(int id, String novoEmail) {
-        buscarOuErro(id).setEmail(novoEmail == null ? "" : novoEmail.trim());
+        Cliente c = buscarOuErro(id);
+        c.setEmail(novoEmail == null ? "" : novoEmail.trim());
+        repositorio.atualizar(c);
     }
 
     public boolean remover(int id) {

@@ -16,6 +16,7 @@ public class Venda {
     private final double desconto;   // valor absoluto do desconto (R$)
     private final double total;      // subtotal - desconto
 
+    /** Construtor usado ao registrar uma nova venda. */
     public Venda(int id, Cliente cliente, List<ItemVenda> itens,
                  FormaPagamento formaPagamento, double desconto) {
         this.id = id;
@@ -24,6 +25,19 @@ public class Venda {
         this.formaPagamento = formaPagamento;
         this.desconto = desconto;
         this.dataHora = LocalDateTime.now();
+        this.subtotal = itens.stream().mapToDouble(ItemVenda::getSubtotal).sum();
+        this.total    = subtotal - desconto;
+    }
+
+    /** Construtor usado ao carregar uma venda do banco de dados. */
+    public Venda(int id, Cliente cliente, List<ItemVenda> itens,
+                 FormaPagamento formaPagamento, double desconto, LocalDateTime dataHora) {
+        this.id = id;
+        this.cliente = cliente;
+        this.itens = itens;
+        this.formaPagamento = formaPagamento;
+        this.desconto = desconto;
+        this.dataHora = dataHora;
         this.subtotal = itens.stream().mapToDouble(ItemVenda::getSubtotal).sum();
         this.total    = subtotal - desconto;
     }

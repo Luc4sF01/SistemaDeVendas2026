@@ -16,6 +16,7 @@ public class Produto {
     }
 
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
     public String getNome() { return nome; }
     public double getPreco() { return preco; }
     public int getQuantidadeEstoque() { return quantidadeEstoque; }
