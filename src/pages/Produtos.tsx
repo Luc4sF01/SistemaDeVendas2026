@@ -42,7 +42,7 @@ export function Produtos() {
   });
 
   const estoqueMutation = useMutation({
-    mutationFn: ({ id, qty }: { id: number; qty: number }) => produtosService.atualizarEstoque(id, qty),
+    mutationFn: ({ id, qty }: { id: number; qty: number }) => produtosService.entradaEstoque(id, qty),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['produtos'] }); closeModal(); },
   });
 

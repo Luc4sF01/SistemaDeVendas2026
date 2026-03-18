@@ -23,17 +23,22 @@ const navItems = [
 
 export function Sidebar() {
   return (
-    <aside className="w-56 min-h-screen bg-primary-800 flex flex-col text-white shadow-xl flex-shrink-0">
+    <aside className="w-60 min-h-screen flex flex-col text-white shadow-xl flex-shrink-0"
+      style={{ background: 'linear-gradient(180deg, #4C1D95 0%, #6D28D9 60%, #5B21B6 100%)' }}>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-primary-700">
-        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-          <PawPrint className="text-primary" size={18} />
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-purple-700/50">
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-lg"
+          style={{ background: 'linear-gradient(135deg, #16A34A, #15803d)' }}>
+          <PawPrint size={20} className="text-white" />
         </div>
-        <span className="font-bold text-lg tracking-tight">VendasPET</span>
+        <div>
+          <span className="font-bold text-lg tracking-tight leading-none">PetsTop</span>
+          <p className="text-purple-300 text-[10px] font-medium tracking-widest uppercase">Pet Shop</p>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-4 px-2 space-y-0.5">
+      <nav className="flex-1 py-4 px-3 space-y-0.5">
         {navItems.map(({ to, icon: Icon, label, end }) => (
           <NavLink
             key={to}
@@ -41,22 +46,31 @@ export function Sidebar() {
             end={end}
             className={({ isActive }) =>
               clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
                 isActive
-                  ? 'bg-white text-primary shadow-sm'
-                  : 'text-blue-100 hover:bg-primary-700 hover:text-white'
+                  ? 'bg-white text-primary shadow-md'
+                  : 'text-purple-200 hover:bg-purple-700/50 hover:text-white'
               )
             }
           >
-            <Icon size={18} />
-            {label}
+            {({ isActive }) => (
+              <>
+                <span className={clsx(
+                  'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
+                  isActive ? 'bg-primary-100' : 'bg-purple-700/40'
+                )}>
+                  <Icon size={15} />
+                </span>
+                {label}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-primary-700 text-xs text-blue-300 text-center">
-        VendasPET v1.0
+      <div className="px-4 py-3 border-t border-purple-700/50 text-[11px] text-purple-400 text-center">
+        PetsTop v1.0 · Sistema de Vendas
       </div>
     </aside>
   );

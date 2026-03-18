@@ -16,8 +16,13 @@ export const produtosService = {
   atualizar: (id: number, data: ProdutoForm) =>
     api.put<Produto>(`/produtos/${id}`, data).then((r) => r.data),
 
+  /** Ajuste absoluto — define o valor exato do estoque */
   atualizarEstoque: (id: number, quantidade: number) =>
-    api.patch<Produto>(`/produtos/${id}/estoque`, { quantidade }).then((r) => r.data),
+    api.patch<Produto>(`/produtos/${id}/estoque`, { quantidade, tipo: 'AJUSTE' }).then((r) => r.data),
+
+  /** Entrada — SOMA a quantidade ao estoque atual */
+  entradaEstoque: (id: number, quantidade: number) =>
+    api.patch<Produto>(`/produtos/${id}/estoque`, { quantidade, tipo: 'ENTRADA' }).then((r) => r.data),
 
   remover: (id: number) => api.delete(`/produtos/${id}`),
 };
