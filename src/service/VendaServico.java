@@ -1,12 +1,14 @@
 package service;
 
 import model.*;
+import org.springframework.stereotype.Service;
 import repository.VendaRepositorio;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class VendaServico {
     private final VendaRepositorio repositorio;
     private final ProdutoServico produtoServico;
@@ -53,6 +55,8 @@ public class VendaServico {
     }
 
     public List<Venda> listarTodas() { return repositorio.listarTodas(); }
+
+    public Optional<Venda> buscarPorId(int id) { return repositorio.buscarPorId(id); }
 
     public List<Venda> listarPorCliente(int clienteId) { return repositorio.listarPorCliente(clienteId); }
 

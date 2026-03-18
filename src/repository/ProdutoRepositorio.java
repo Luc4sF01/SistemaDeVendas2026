@@ -2,12 +2,14 @@ package repository;
 
 import database.ConexaoBanco;
 import model.Produto;
+import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class ProdutoRepositorio {
 
     /** ID temporário — será substituído pelo gerado no banco após salvar(). */
