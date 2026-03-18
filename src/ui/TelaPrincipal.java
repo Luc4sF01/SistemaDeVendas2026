@@ -21,7 +21,7 @@ public class TelaPrincipal extends JFrame {
         PainelEstoque    estoque    = new PainelEstoque(produtoServico);
         PainelClientes   clientes   = new PainelClientes(clienteServico);
         PainelVendas     vendas     = new PainelVendas(vendaServico, produtoServico, clienteServico);
-        PainelRelatorios relatorios = new PainelRelatorios(vendaServico);
+        PainelRelatorios relatorios = new PainelRelatorios(vendaServico, produtoServico);
 
         JTabbedPane abas = new JTabbedPane(JTabbedPane.LEFT);
         abas.setFont(new Font("Segoe UI", Font.PLAIN, 13));

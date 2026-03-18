@@ -2,11 +2,14 @@ package ui;
 
 import model.Produto;
 import service.ProdutoServico;
+import util.ExportadorCSV;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -88,6 +91,9 @@ public class PainelEstoque extends JPanel {
         // ── Botões de ação ──
         JButton btnEntrada  = criarBotao("↑  Entrada de Estoque", new Color(0, 120, 60));
         JButton btnAjustar  = criarBotao("✎  Ajustar Quantidade", new Color(0, 100, 200));
+        JButton btnExportar = criarBotao("↓  Exportar CSV",        new Color(100, 60, 160));
+        JButton btnImportar = criarBotao("↑  Importar CSV",        new Color(150, 80, 0));
+        JButton btnModelo   = criarBotao("?  Modelo CSV",           new Color(80, 80, 80));
         btnEntrada.setEnabled(false);
         btnAjustar.setEnabled(false);
 
@@ -100,6 +106,9 @@ public class PainelEstoque extends JPanel {
         legenda.add(quadrado(new Color(255, 235, 150)));  legenda.add(new JLabel("Baixo (≤ " + BAIXO + ")"));
         legenda.add(quadrado(new Color(230, 255, 230)));  legenda.add(new JLabel("OK"));
 
+        painelBotoes.add(btnModelo);
+        painelBotoes.add(btnImportar);
+        painelBotoes.add(btnExportar);
         painelBotoes.add(btnEntrada);
         painelBotoes.add(btnAjustar);
 
@@ -130,6 +139,10 @@ public class PainelEstoque extends JPanel {
             Produto p = getProdutoSelecionado();
             if (p != null) abrirAjusteEstoque(p);
         });
+
+        btnExportar.addActionListener(e -> exportarCSV());
+        btnImportar.addActionListener(e -> importarCSV());
+        btnModelo.addActionListener(e -> baixarModelo());
 
         carregarTabela();
     }
@@ -254,6 +267,68 @@ public class PainelEstoque extends JPanel {
         JLabel l = new JLabel("  "); l.setOpaque(true); l.setBackground(cor);
         l.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         l.setPreferredSize(new Dimension(14, 14)); return l;
+    }
+
+    private void exportarCSV() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Salvar Estoque como CSV");
+        fc.setSelectedFile(new File("estoque.csv"));
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo CSV (*.csv)", "csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        File destino = garantirExtensao(fc.getSelectedFile(), ".csv");
+        try {
+            ExportadorCSV.exportarEstoque(servico.listarTodos(), destino);
+            JOptionPane.showMessageDialog(this,
+                    "Arquivo salvo em:\n" + destino.getAbsolutePath(),
+                    "Exportação concluída", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao exportar: " + ex.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void importarCSV() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Selecionar arquivo CSV para importar");
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo CSV (*.csv)", "csv"));
+        if (fc.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        try {
+            String resultado = ExportadorCSV.importarEstoque(fc.getSelectedFile(), servico);
+            JOptionPane.showMessageDialog(this, resultado,
+                    "Importação", JOptionPane.INFORMATION_MESSAGE);
+            carregarTabela();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao importar: " + ex.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void baixarModelo() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Salvar modelo CSV");
+        fc.setSelectedFile(new File("modelo_importacao.csv"));
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo CSV (*.csv)", "csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        File destino = garantirExtensao(fc.getSelectedFile(), ".csv");
+        try {
+            ExportadorCSV.gerarModelo(destino);
+            JOptionPane.showMessageDialog(this,
+                    "Modelo salvo! Abra no Excel, preencha e importe.\n\n" +
+                    "Colunas: nome ; preco ; estoque ; categoria\n" +
+                    "Categorias válidas: Ração, Brinquedo, Higiene,\n" +
+                    "Medicamento, Acessório, Outro",
+                    "Modelo gerado", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro: " + ex.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private File garantirExtensao(File f, String ext) {
+        return f.getName().toLowerCase().endsWith(ext) ? f : new File(f.getAbsolutePath() + ext);
     }
 
     public void atualizar() { carregarTabela(); }

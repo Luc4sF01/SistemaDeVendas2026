@@ -1,11 +1,16 @@
 package ui;
 
 import model.Venda;
+import service.ProdutoServico;
 import service.VendaServico;
+import util.ExportadorCSV;
+import util.ExportadorPDF;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -24,6 +29,7 @@ public class PainelRelatorios extends JPanel {
     private static final DateTimeFormatter FMT_D  = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final VendaServico vendaServico;
+    private final ProdutoServico produtoServico;
 
     // Aba 1 – Resumo
     private final JLabel lblTotalGeral;
@@ -44,12 +50,16 @@ public class PainelRelatorios extends JPanel {
     private final DefaultTableModel modeloPeriodo;
     private final JLabel lblTotalPeriodo;
 
-    public PainelRelatorios(VendaServico vendaServico) {
-        this.vendaServico = vendaServico;
+    // Referência às abas para saber qual exportar em CSV
+    private JTabbedPane abas;
+
+    public PainelRelatorios(VendaServico vendaServico, ProdutoServico produtoServico) {
+        this.vendaServico   = vendaServico;
+        this.produtoServico = produtoServico;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JTabbedPane abas = new JTabbedPane();
+        abas = new JTabbedPane();
         abas.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
         // ═══════════════════════════════════════════
@@ -156,12 +166,29 @@ public class PainelRelatorios extends JPanel {
         abaPeriodo.add(new JScrollPane(tabelaPeriodo), BorderLayout.CENTER);
 
         // ═══════════════════════════════════════════
-        // Botão global Atualizar
+        // Rodapé — Atualizar + Exportar
         // ═══════════════════════════════════════════
         JButton btnAtualizar = new JButton("⟳  Atualizar Tudo");
         btnAtualizar.addActionListener(e -> atualizar());
+
+        JButton btnExportarCSV = new JButton("↓  Exportar CSV");
+        btnExportarCSV.setBackground(new Color(100, 60, 160));
+        btnExportarCSV.setForeground(Color.WHITE);
+        btnExportarCSV.setFocusPainted(false);
+        btnExportarCSV.setToolTipText("Exporta a aba visível para CSV (abre no Excel)");
+        btnExportarCSV.addActionListener(e -> exportarCSV());
+
+        JButton btnExportarPDF = new JButton("📄  Exportar PDF");
+        btnExportarPDF.setBackground(new Color(180, 30, 30));
+        btnExportarPDF.setForeground(Color.WHITE);
+        btnExportarPDF.setFocusPainted(false);
+        btnExportarPDF.setToolTipText("Gera relatório financeiro completo em PDF");
+        btnExportarPDF.addActionListener(e -> exportarPDF());
+
         JPanel rodape = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         rodape.add(btnAtualizar);
+        rodape.add(btnExportarCSV);
+        rodape.add(btnExportarPDF);
 
         abas.addTab("  Resumo  ", abaResumo);
         abas.addTab("  Mais Vendidos  ", abaMV);
@@ -170,6 +197,64 @@ public class PainelRelatorios extends JPanel {
 
         add(abas, BorderLayout.CENTER);
         add(rodape, BorderLayout.SOUTH);
+    }
+
+    private void exportarCSV() {
+        // Determina qual modelo exportar com base na aba selecionada
+        DefaultTableModel modelo;
+        String nomeArquivo;
+        switch (abas.getSelectedIndex()) {
+            case 0 -> { modelo = modeloPagamentos;  nomeArquivo = "relatorio_pagamentos.csv"; }
+            case 1 -> { modelo = modeloMaisVendidos; nomeArquivo = "relatorio_mais_vendidos.csv"; }
+            case 2 -> { modelo = modeloCategoria;    nomeArquivo = "relatorio_categorias.csv"; }
+            default -> { modelo = modeloPeriodo;     nomeArquivo = "relatorio_periodo.csv"; }
+        }
+
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Salvar relatório como CSV");
+        fc.setSelectedFile(new File(nomeArquivo));
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo CSV (*.csv)", "csv"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        File destino = garantirExtensao(fc.getSelectedFile(), ".csv");
+        try {
+            ExportadorCSV.exportarTabela(modelo, destino);
+            JOptionPane.showMessageDialog(this,
+                    "Arquivo salvo em:\n" + destino.getAbsolutePath(),
+                    "Exportação concluída", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao exportar: " + ex.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void exportarPDF() {
+        JFileChooser fc = new JFileChooser();
+        fc.setDialogTitle("Salvar relatório PDF");
+        fc.setSelectedFile(new File("relatorio_vendaspet.pdf"));
+        fc.setFileFilter(new FileNameExtensionFilter("Arquivo PDF (*.pdf)", "pdf"));
+        if (fc.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        File destino = garantirExtensao(fc.getSelectedFile(), ".pdf");
+        try {
+            ExportadorPDF.exportarRelatorio(vendaServico, produtoServico, destino);
+            JOptionPane.showMessageDialog(this,
+                    "Relatório gerado com sucesso!\n" + destino.getAbsolutePath(),
+                    "PDF gerado", JOptionPane.INFORMATION_MESSAGE);
+
+            // Tenta abrir o PDF automaticamente
+            try {
+                java.awt.Desktop.getDesktop().open(destino);
+            } catch (Exception ignored) {}
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao gerar PDF: " + ex.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private File garantirExtensao(File f, String ext) {
+        return f.getName().toLowerCase().endsWith(ext) ? f : new File(f.getAbsolutePath() + ext);
     }
 
     public void atualizar() {
