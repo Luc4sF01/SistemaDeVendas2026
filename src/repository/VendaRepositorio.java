@@ -6,15 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class VendaRepositorio {
-
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     /** ID temporário — o banco gera o ID real no INSERT. */
     public int gerarId() {
@@ -43,7 +40,7 @@ public class VendaRepositorio {
                     ps.setNull(1, Types.INTEGER);
                 }
                 ps.setString(2, venda.getFormaPagamento().name());
-                ps.setString(3, venda.getDataHora().format(FMT));
+                ps.setTimestamp(3, Timestamp.valueOf(venda.getDataHora()));
                 ps.setDouble(4, venda.getSubtotal());
                 ps.setDouble(5, venda.getDesconto());
                 ps.setDouble(6, venda.getTotal());
@@ -135,7 +132,7 @@ public class VendaRepositorio {
         List<ItemVenda> itens = carregarItens(vendaId);
         FormaPagamento formaPagamento = FormaPagamento.valueOf(rsVenda.getString("forma_pagamento"));
         double desconto = rsVenda.getDouble("desconto");
-        LocalDateTime dataHora = LocalDateTime.parse(rsVenda.getString("data_hora"), FMT);
+        LocalDateTime dataHora = rsVenda.getTimestamp("data_hora").toLocalDateTime();
 
         return new Venda(vendaId, cliente, itens, formaPagamento, desconto, dataHora);
     }
