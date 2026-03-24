@@ -15,45 +15,45 @@ public class InicializadorBanco {
 
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS clientes (
-                    id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nome      TEXT    NOT NULL,
-                    telefone  TEXT    NOT NULL,
-                    email     TEXT    NOT NULL DEFAULT ''
+                    id        SERIAL PRIMARY KEY,
+                    nome      VARCHAR(255) NOT NULL,
+                    telefone  VARCHAR(255) NOT NULL,
+                    email     VARCHAR(255) NOT NULL DEFAULT ''
                 )
             """);
 
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS produtos (
-                    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nome                TEXT    NOT NULL,
-                    preco               REAL    NOT NULL,
-                    quantidade_estoque  INTEGER NOT NULL DEFAULT 0,
-                    categoria           TEXT    NOT NULL
+                    id                  SERIAL PRIMARY KEY,
+                    nome                VARCHAR(255) NOT NULL,
+                    preco               NUMERIC(10,2) NOT NULL,
+                    quantidade_estoque  INTEGER       NOT NULL DEFAULT 0,
+                    categoria           VARCHAR(255)  NOT NULL
                 )
             """);
 
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS vendas (
-                    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id               SERIAL PRIMARY KEY,
                     cliente_id       INTEGER,
-                    forma_pagamento  TEXT    NOT NULL,
-                    data_hora        TEXT    NOT NULL,
-                    subtotal         REAL    NOT NULL,
-                    desconto         REAL    NOT NULL,
-                    total            REAL    NOT NULL,
+                    forma_pagamento  VARCHAR(255)  NOT NULL,
+                    data_hora        TIMESTAMP     NOT NULL,
+                    subtotal         NUMERIC(10,2) NOT NULL,
+                    desconto         NUMERIC(10,2) NOT NULL,
+                    total            NUMERIC(10,2) NOT NULL,
                     FOREIGN KEY (cliente_id) REFERENCES clientes(id)
                 )
             """);
 
             stmt.execute("""
                 CREATE TABLE IF NOT EXISTS itens_venda (
-                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                    venda_id        INTEGER NOT NULL,
-                    produto_id      INTEGER NOT NULL,
-                    nome_produto    TEXT    NOT NULL,
-                    quantidade      INTEGER NOT NULL,
-                    preco_unitario  REAL    NOT NULL,
-                    categoria       TEXT    NOT NULL DEFAULT '',
+                    id              SERIAL PRIMARY KEY,
+                    venda_id        INTEGER       NOT NULL,
+                    produto_id      INTEGER       NOT NULL,
+                    nome_produto    VARCHAR(255)  NOT NULL,
+                    quantidade      INTEGER       NOT NULL,
+                    preco_unitario  NUMERIC(10,2) NOT NULL,
+                    categoria       VARCHAR(255)  NOT NULL DEFAULT '',
                     FOREIGN KEY (venda_id)   REFERENCES vendas(id),
                     FOREIGN KEY (produto_id) REFERENCES produtos(id)
                 )

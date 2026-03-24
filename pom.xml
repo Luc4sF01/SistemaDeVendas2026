@@ -28,11 +28,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- SQLite JDBC - banco de dados embutido, sem servidor -->
+        <!-- PostgreSQL JDBC -->
         <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.45.3.0</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
         </dependency>
 
         <!-- OpenPDF - geração de PDF (licença LGPL, livre para uso comercial) -->

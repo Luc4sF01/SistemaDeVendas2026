@@ -35,8 +35,8 @@ public class ProdutoController {
     public ResponseEntity<Produto> cadastrar(@RequestBody Map<String, Object> body) {
         Produto p = produtoServico.cadastrar(
                 (String) body.get("nome"),
-                ((Number) body.get("preco")).doubleValue(),
-                ((Number) body.get("quantidadeEstoque")).intValue(),
+                Double.parseDouble(body.get("preco").toString()),
+                Integer.parseInt(body.get("quantidadeEstoque").toString()),
                 (String) body.get("categoria")
         );
         return ResponseEntity.status(201).body(p);
@@ -45,8 +45,8 @@ public class ProdutoController {
     @PutMapping("/{id}")
     public ResponseEntity<Produto> atualizar(@PathVariable int id, @RequestBody Map<String, Object> body) {
         if (body.containsKey("nome"))              produtoServico.atualizarNome(id, (String) body.get("nome"));
-        if (body.containsKey("preco"))             produtoServico.atualizarPreco(id, ((Number) body.get("preco")).doubleValue());
-        if (body.containsKey("quantidadeEstoque")) produtoServico.atualizarEstoque(id, ((Number) body.get("quantidadeEstoque")).intValue());
+        if (body.containsKey("preco"))             produtoServico.atualizarPreco(id, Double.parseDouble(body.get("preco").toString()));
+        if (body.containsKey("quantidadeEstoque")) produtoServico.atualizarEstoque(id, Integer.parseInt(body.get("quantidadeEstoque").toString()));
         return produtoServico.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -54,7 +54,7 @@ public class ProdutoController {
 
     @PatchMapping("/{id}/estoque")
     public ResponseEntity<Produto> ajustarEstoque(@PathVariable int id, @RequestBody Map<String, Object> body) {
-        int quantidade = ((Number) body.get("quantidade")).intValue();
+        int quantidade = Integer.parseInt(body.get("quantidade").toString());
         String tipo = (String) body.get("tipo");
 
         Produto produto = produtoServico.buscarPorId(id)
